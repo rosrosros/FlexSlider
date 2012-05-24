@@ -76,10 +76,12 @@
         }
         
         slider.doMath();
-        slider.setup("init");
         
         // ASNAV:
         if (asNav) methods.asNav.setup();
+        
+        // INIT
+        slider.setup("init");
         
         // CONTROLNAV:
         if (vars.controlNav) methods.controlNav.setup();
@@ -136,6 +138,8 @@
       },
       asNav: {
         setup: function() {
+          slider.asNav = true;
+          slider.animatingTo = Math.floor(slider.currentSlide/slider.move);
           slider.currentItem = slider.currentSlide;
           slider.slides.removeClass(namespace + "active-slide").eq(slider.currentItem).addClass(namespace + "active-slide");
           slider.slides.click(function(e){
@@ -375,12 +379,11 @@
       },
       sync: function(action) {
         var $obj = $(vars.sync).data("flexslider"),
-            // target = (slider.animatingTo > slider.currentSlide) ? $obj.getTarget("next") : $obj.getTarget("prev");
             target = slider.animatingTo;
         
         switch (action) {
           case "animate": $obj.flexAnimate(target, vars.pauseOnAction, false, true); break;
-          case "play": if (!$obj.playing) { $obj.play(); } break;
+          case "play": if (!$obj.playing && !$obj.asNav) { $obj.play(); } break;
           case "pause": $obj.pause(); break;
         }
       }
@@ -392,7 +395,7 @@
         if (asNav && withSync) {
           var master = $(vars.asNavFor).data('flexslider');
           slider.atEnd = target === 0 || target === slider.count - 1;
-          master.flexAnimate(target, master.pauseOnAction, false, true, fromNav);
+          master.flexAnimate(target, true, false, true, fromNav);
           slider.direction = (slider.currentItem < target) ? "next" : "prev";
           master.direction = slider.direction;
           
@@ -412,11 +415,11 @@
         // API: before() animation Callback
         vars.before(slider);
         
-        // SYNC:
-        if (slider.syncExists && !fromNav) methods.sync("animate");
-        
         // SLIDESHOW:
         if (pause) slider.pause();
+        
+        // SYNC:
+        if (slider.syncExists && !fromNav) methods.sync("animate");
         
         // CONTROLNAV
         if (vars.controlNav) methods.controlNav.active();
@@ -565,6 +568,7 @@
       // SLIDE:
       if (!fade) {
         var sliderOffset, arr;
+            
         if (type === "init") {
           slider.viewport = $('<div class="flex-viewport"></div>').css({"overflow": "hidden", "position": "relative"}).appendTo(slider).append(slider.container);
           // INFINITE LOOP:
