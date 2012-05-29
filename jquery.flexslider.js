@@ -187,6 +187,12 @@
               slider.flexAnimate(slider.controlNav.index($target), vars.pauseOnAction);
             }
           });
+          // Prevent iOS click event bug
+          if (touch) {
+            slider.controlNav.closest('.' + namespace + 'control-nav').bind("click", function(event) {
+              event.preventDefault();
+            });
+          }
         },
         setupManual: function() {
           slider.controlNav = slider.manualControls;
@@ -201,6 +207,12 @@
               slider.flexAnimate(target, vars.pauseOnAction);
             }
           });
+          // Prevent iOS click event bug
+          if (touch) {
+            slider.controlNav.live("click", function(event) {
+              event.preventDefault();
+            });
+          }
         },
         set: function() {
           var selector = (vars.controlNav === "thumbnails") ? 'img' : 'a';
@@ -235,6 +247,12 @@
             var target = ($(this).hasClass(namespace + 'next')) ? slider.getTarget('next') : slider.getTarget('prev');
             slider.flexAnimate(target, vars.pauseOnAction);
           });
+          // Prevent iOS click event bug
+          if (touch) {
+            slider.directionNav.bind("click", function(event) {
+              event.preventDefault();
+            });
+          }
         },
         update: function() {
           if (!vars.animationLoop) {
@@ -274,6 +292,12 @@
               slider.manualPause = false;
             }
           });
+          // Prevent iOS click event bug
+          if (touch) {
+            slider.pausePlay.bind("click", function(event) {
+              event.preventDefault();
+            });
+          }
         },
         update: function(state) {
           (state === "play") ? slider.pausePlay.removeClass(namespace + 'pause').addClass(namespace + 'play').text(vars.playText) : slider.pausePlay.removeClass(namespace + 'play').addClass(namespace + 'pause').text(vars.pauseText);
